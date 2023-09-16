@@ -3994,7 +3994,6 @@ def getHSSShearStrength(hss_section, Fy, orientation):
     
     return V_allow
 
-
 # Debugging section:
 
 
