@@ -53,11 +53,11 @@ Other configurations with three or more studs will be included in the future.
     Returns the allowable axial strength of a built up back to back c-section member **with** lips. Track sections currently are not permitted. 
 
 * Bending Strength Capacity:
-    1. `getFlexuralStrength_Single`:
+    1. `getFlexuralStrength_Single()`:
     Return the strong axis allowable bending moment of a single c-section member **with or without** lips. 
-    2. `getFlexuralStrength_Boxed`: 
+    2. `getFlexuralStrength_Boxed()`: 
     Return the strong axis allowable bending moment of a built-up c-section boxed member **with** lips.
-    3. `getFlexuralStrength_B2B`:
+    3. `getFlexuralStrength_B2B()`:
     Return the strong axis allowable bending moment of a built-up c-section back to back member **with** lips.
 * Bending Strength Capacity for Globally Braced Member:
     1. `getFlexuralStrength_Single_GB()`:
@@ -90,31 +90,41 @@ Some calculation procedures were isolated as auxiliary functions to optimize the
 * `calulateEffectiveSectionModulus_B2B()`:
 
 
-### Parameters Used:
+### Parameters and Variables Used:
 The design functions include several parameters that at first glance might not be obvious. The following list explains each of the parameters that can be found in several or just some of module design functions:
 
-1. `target_id`:
-2. `section_type`:
-3. `L_stud`:
-4. `Fy`:
-5. `S_bracing`: 
-6. `F_bracing`:
-7. `E`:
-8. `G`:
-9. `P_width`:
-10. `P_length`:
-11. `P_cond`:
-12. `K_x`:
-13. `K_y`:
-14. `K_t`:
-
-
-
+1. `target_id`: <font color="yellowgreen">(Type: string)</font> Section name / ID according to the AISI standard. Must be a c-section (stud or track). Ex: '600S200-97' 
+2. `section_type`: <font color="yellowgreen">(Type: string)</font> Section type to use, stud or track. Ex: 'stud'.
+3. `L_stud`: <font color="yellowgreen">(Type: float)</font> Total length of the cold formed steel member in feet. 
+4. `Fy`: <font color="yellowgreen">(Type: float)</font> Yield stress for design calculations in kips per square inch.
+5. `S_bracing`: <font color="yellowgreen">(Type: float)</font> Weak axis axial bracing in cold formed steel member, in feet.
+6. `F_bracing`: <font color="yellowgreen">(Type: float)</font> Weak axis flexural bracing in cold formed steel member, in feet
+7. `E`: <font color="yellowgreen">(Type: float)</font> Elastic modulus of the member to be designed. Units in kips per square inch.
+8. `G`: <font color="yellowgreen">(Type: float)</font> Shear modulus of the member to be designed. Units in kips.
+9. `P_width`: <font color="yellowgreen">(Type: float)</font> Punchout width on stud member in inches.
+10. `P_length`: <font color="yellowgreen">(Type: float)</font> Punchout length on stud member in inches.
+11. `P_cond`: <font color="yellowgreen">(Type: bool)</font> Punchout condition in stud member, `True` or `False`.
+12. `K_x`: <font color="yellowgreen">(Type: float)</font> Strong axis effective length factor, unitless
+13. `K_y`: <font color="yellowgreen">(Type: float)</font> Weak axis effective length factor, unitless
+14. `K_t`: <font color="yellowgreen">(Type: float)</font> Effective length factor fro twisting, unitless
+15. `L_x`: <font color="yellowgreen">(Type: float)</font>
+Strong axis unbraced length, feet.
+16. `L_y`: <font color="yellowgreen">(Type: float)</font> Weak axis unbraced length, feet.
+17. `L_t`: <font color="yellowgreen">(Type: float)</font>
+Unbraced length for twisting, feet
+18. `Cb`: <font color="yellowgreen">(Type: float)</font> Bending coefficient dependent on moment gradient, unitless
+19. `a`: <font color="yellowgreen">(Type: float)</font>
+Interconnection spacing for built up sections (boxed and back to back), inches.
+20. `dist_bracing`: <font color="yellowgreen">(Type: bool)</font> Distortional bracing status, `True` or `False`.
+21. `L_dist_bracing`: <font color="yellowgreen">(Type: float)</font> Distortional bracing unbraced length, if bracing for this limit state is considered, feet.
+22. `poiss`: <font color="yellowgreen">(Type: float)</font> Material poisson ratio, unitless. 
+23. `hss_section`: <font color="yellowgreen">(Type: string)</font> HSS section for design and revision. Ex: 'HSS6X6X5/8'.
+24. `orientation`: <font color="yellowgreen">(Type: string)</font> Orientation of structural member to be designed. Shall be 'strong' axis or 'weak' axis. Only applicable for HSS section design functions.
 
 
 ## Installation and Use:
 
-No actual installation process is actually needed in this case. The script itself can be cloned or downloaded straight from the online repository an can be imported as a module in other Python scripts as needed. 
+No actual installation process is needed in this case. The script itself can be cloned or downloaded straight from the online repository an can be imported as a module in other Python scripts as needed. 
 
 Since functions were originally developed to automate CFS design spreadsheets in Excel, they can also be used with [xlwings](https://github.com/xlwings/xlwings). These can be imported as UDF with the xlwings add in directly in an excel file and can be run automatically like a native excel function within a spreadsheet. 
 
