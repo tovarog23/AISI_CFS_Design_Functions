@@ -18,10 +18,10 @@ Aside from the manual itself, resources and examples related to the design of co
 
 ### Modules and Technologies Employed:
 The following modules were used in the development of this respository:
-* <a href="https://github.com/connorferster/forallpeople">forallpeople</a>: Used for better unit management during the calculation process. 
-* <a href="https://pypi.org/project/numpy/">numpy</a>: Used for simplification of some basic procedures when dealing with arrays.
-* <a href="https://docs.python.org/3/library/csv.html">csv</a>: Used to manage csv files when reading the properties of codl formed steel structural sections
-* <a href="https://docs.python.org/3/library/os.html">os</a>: Module used to determine the location of any external files needed for the module functions to work properly. 
+* <a href="https://github.com/connorferster/forallpeople" target="_blank">forallpeople</a>: Used for better unit management during the calculation process. 
+* <a href="https://pypi.org/project/numpy/" target="_blank">numpy</a>: Used for simplification of some basic procedures when dealing with arrays.
+* <a href="https://docs.python.org/3/library/csv.html" target="_blank">csv</a>: Used to manage csv files when reading the properties of codl formed steel structural sections
+* <a href="https://docs.python.org/3/library/os.html" target="_blank">os</a>: Module used to determine the location of any external files needed for the module functions to work properly. 
 
 ### Design Capabilities:
 The functions developed return different capacities under the typical limit states that can be found on cold formed steel elements. The calculated values than can be obtained are the following:
