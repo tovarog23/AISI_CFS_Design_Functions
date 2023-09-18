@@ -138,6 +138,8 @@ Since functions were originally developed to automate CFS design spreadsheets in
 
 For use, the design functions simply need to be called into another script or into an excel spreadsheet. All functions rely on having the correct csv files to be able to obtain the corresponding properties of the selected section when running the function. 
 
+The example file (`example_calcs.py`) contains a simple script showing how all functions can be called. Results are printed for user verification. 
+
 
 
 

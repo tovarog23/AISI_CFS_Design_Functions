@@ -1,7 +1,4 @@
 from aisi_design_functions import *
-import aisi_design_functions
-
-# Design examples using aisi_design_functions module:
 
 # Axial Examples -------------------------------------------------------------------------------------------------------------------------------
 axialResultSingle = getAxialStrength_Single('600S200-97','stud',10,50,4,29500,11300,1.5,True,1,1,1,10,4,4)

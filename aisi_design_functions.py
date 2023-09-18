@@ -12,7 +12,7 @@ import time
         AISI S100-16
         AISI Cold Formed Steel Design Manual 2017
         AISC 360-10 (14th Edition Manual)
-
+    
     The following script was developed with the objective of providing useful design functions for engineers and professionals involved in the analysis and design of cold formed steel structures, particularly buildings consisting of load bearing wall panels and joist floor systems.
     
     The functions themselves can be imported into other python scripts or be integrated directly to an excel spreadsheet if necessary through the use of xlwings, which allows any user to import user defined functions (UDF).
@@ -1358,7 +1358,9 @@ def getAxialStrength_Single(target_id:str, section_type:str, L_stud:float, Fy:fl
     poiss = 0.3
     list_sections = []
     s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    print('ssectionpath: ',s_section_path)
     rawPath_s_section = r'' + s_section_path
+    
     if section_type == 'stud':
         try:
             with open(rawPath_s_section, 'r', encoding="utf-8-sig") as csv_file:
