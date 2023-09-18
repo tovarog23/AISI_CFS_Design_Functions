@@ -34,11 +34,16 @@ These are the typical values that need to be obtained in order to design most st
 
 **The design process and returned values only comply with the Allowable Stress Design (ASD) methodology for now. LRFD is pending for now.**
 
+**Current calculations are done using the imperial system of units. The code can be easily adapted by any potential user for another unit system if required, since all calculations are done with the `forallpeople` module.**
+
+
 ## Functions:
 
 At this point, the functions only work with specific shapes and sections. Currently only typical C-Sections with and without lips (stud and track sections) were considered in the calculation process in each function. These sections that can be used in the functions developed can be found in Table I-2 and Table I-3 in the AISI Cold Formed Steel Design Manual.
 
 Since built up sections are also quite common, functions that can calculate the different limit state capacities of this type of elements were also included. Only back to back and boxed section configurations have been included so far in the repository.
+
+Additionally, cold-work of forming is not included in any of the functions and calculations. This consideration will be implemented in future versions. As of now, results without considering cold-work as per AISI remain on the conservative side. 
 
 Other configurations with three or more studs will be included in the future.
 
@@ -46,31 +51,32 @@ Other configurations with three or more studs will be included in the future.
 
 * Axial Strength Capacity: 
     1. `getAxialStrength_Single()`:
-    Returns the allowable axial strength of a single c-section stud **with** lips. Current function does not work with track sections.
+    Returns the allowable axial strength of a single c-section stud **with** lips. Track sections currently are not available.
     2. `getAxialStrength_Boxed()`:
-    Returns the allowable axial strength of a built up boxed c-section member **with** lips. Track sections currently are not permitted. 
+    Returns the allowable axial strength of a built up boxed c-section member **with** lips. Track sections currently are not available.
     3. `getAxialStrength_B2B()`:
-    Returns the allowable axial strength of a built up back to back c-section member **with** lips. Track sections currently are not permitted. 
+    Returns the allowable axial strength of a built up back to back c-section member **with** lips. Track sections currently are not available.
 
 * Bending Strength Capacity:
     1. `getFlexuralStrength_Single()`:
-    Return the strong axis allowable bending moment of a single c-section member **with or without** lips. 
+    Return the strong axis allowable bending moment of a single c-section member **with or without** lips. Track sections can only be used if unpunched.
     2. `getFlexuralStrength_Boxed()`: 
-    Return the strong axis allowable bending moment of a built-up c-section boxed member **with** lips.
+    Return the strong axis allowable bending moment of a built-up c-section boxed member **with or without** lips. Track sections can only be used if unpunched.
     3. `getFlexuralStrength_B2B()`:
-    Return the strong axis allowable bending moment of a built-up c-section back to back member **with** lips.
+    Return the strong axis allowable bending moment of a built-up c-section back to back member **with** lips. Track sections are not available.
+
 * Bending Strength Capacity for Globally Braced Member:
     1. `getFlexuralStrength_Single_GB()`:
-    Return the strong axis allowable bending moment of a globally braced single c-section member **with or without** lips.
+    Return the strong axis allowable bending moment of a globally braced single c-section member **with or without** lips. Track sections can only be used if unpunched.
     2. `getFlexuralStrength_Boxed_GB()`:
-    Return the strong axis allowable bending moment of a globally braced built-up c-section boxed member **with** lips.
+    Return the strong axis allowable bending moment of a globally braced built-up c-section boxed member **with** lips. Track sections can only be used if unpunched.
     3. `getFlexuralStrength_B2B_GB()`:
-    Return the strong axis allowable bending moment of a globally braced built-up c-section back to back member **with** lips.
+    Return the strong axis allowable bending moment of a globally braced built-up c-section back to back member **with** lips. Track sections are not available.
 * Shear Strength Capacity:
     1. `getShearStrength_Single()`:
-    Return the allowable shear strength of a single c-section member **with or without** lips. 
+    Return the allowable shear strength of a single c-section member **with or without** lips. Track sections are available.
     2. `getShearStrength_BuiltUp()`:
-    Return the allowable shear strength of a built up c-section member **with or without** lips. The section can be either boxed or built-up only.
+    Return the allowable shear strength of a built up c-section member **with or without** lips. The section can be either boxed or built-up only. Track sections are available.
 
 Additionally, functions to calculate the capacity of HSS members were added to the module. These were added due to how common their use is within the cold formed steel industry:
 
@@ -78,17 +84,20 @@ Additionally, functions to calculate the capacity of HSS members were added to t
     1. `getHSSAxialStrength()`:
     Returns the allowable axial strength of an HSS typical section. 
 * HSS Flexural Capacity:
+
     2. `getHSSFlexuralStrength()`:
     Returns the allowable bending capacity of a typical HSS section.
 * HSS Shear Capacity:
+
     3. `getHSSShearStrength()`:
     Returns the allowable shear strength of a typical HSS section.
 
 Some calculation procedures were isolated as auxiliary functions to optimize the code and readability. The following additional functions can be found in the module being called inside several design functions:
 
 * `calcEffectiveSectionModulus()`:
+Returns the effective section modulus of a cold formed steel single member section, track or stud section. The calculation process is iterative and the amount of iterations can be adjusted inside the function. 
 * `calulateEffectiveSectionModulus_B2B()`:
-
+Returns the effective section modulus of a cold formed steel back to back built up section. The calculation process is iterative and can be ajdusted within the function. 
 
 ### Parameters and Variables Used:
 The design functions include several parameters that at first glance might not be obvious. The following list explains each of the parameters that can be found in several or just some of module design functions:
@@ -108,7 +117,7 @@ The design functions include several parameters that at first glance might not b
 13. `K_y`: <font color="yellowgreen">(Type: float)</font> Weak axis effective length factor, unitless
 14. `K_t`: <font color="yellowgreen">(Type: float)</font> Effective length factor fro twisting, unitless
 15. `L_x`: <font color="yellowgreen">(Type: float)</font>
-Strong axis unbraced length, feet.
+Strong axis unbraced length, feet.  
 16. `L_y`: <font color="yellowgreen">(Type: float)</font> Weak axis unbraced length, feet.
 17. `L_t`: <font color="yellowgreen">(Type: float)</font>
 Unbraced length for twisting, feet
@@ -121,15 +130,13 @@ Interconnection spacing for built up sections (boxed and back to back), inches.
 23. `hss_section`: <font color="yellowgreen">(Type: string)</font> HSS section for design and revision. Ex: 'HSS6X6X5/8'.
 24. `orientation`: <font color="yellowgreen">(Type: string)</font> Orientation of structural member to be designed. Shall be 'strong' axis or 'weak' axis. Only applicable for HSS section design functions.
 
-
 ## Installation and Use:
 
 No actual installation process is needed in this case. The script itself can be cloned or downloaded straight from the online repository an can be imported as a module in other Python scripts as needed. 
 
-Since functions were originally developed to automate CFS design spreadsheets in Excel, they can also be used with [xlwings](https://github.com/xlwings/xlwings). These can be imported as UDF with the xlwings add in directly in an excel file and can be run automatically like a native excel function within a spreadsheet. 
+Since functions were originally developed to automate CFS design spreadsheets in Excel, they can also be used with [xlwings](https://github.com/xlwings/xlwings). These can be imported as UDF with the xlwings add-in directly in an excel file and can be run automatically like a native excel function within a spreadsheet. 
 
 For use, the design functions simply need to be called into another script or into an excel spreadsheet. All functions rely on having the correct csv files to be able to obtain the corresponding properties of the selected section when running the function. 
-
 
 
 

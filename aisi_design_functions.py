@@ -1224,8 +1224,8 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
     E = E*ksi
     G = G*ksi
     P_width = P_width*inch
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -1251,18 +1251,10 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
                         t = float(line[keys[3]])
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
-                        Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
-                        Ix = float(line[keys[8]])
-                        Sx = float(line[keys[9]])
-                        Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
-                        xo = float(line[keys[20]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
             csv_reader = csv.DictReader(csv_file)
@@ -1282,28 +1274,13 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
                         base = float(line[keys[2]])
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
-                        Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
-                        Ix = float(line[keys[7]])
-                        Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
-                        Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
                         Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
-                        xo = float(line[keys[19]])
 
     if target_id in list_sections:
         Depth = Depth*inch
-        Ag = Area*inch**2
-        Ixxg = Ix*inch**4
-        Iyyg = Iy*inch**4
-        x_o = xo*inch
         Cw = Cw*inch**6
         base = base*inch
         t = t*inch
@@ -1312,14 +1289,7 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
             D = D*inch # this is the small d value - lip dimension
         x_m = x_m*inch
         J = J*inch**4
-        r_x = sqrt(Ixxg/Ag)*inch
-        r_y = sqrt(Iyyg/Ag)*inch
-        r_o = sqrt((r_x**2)+(r_y**2)+(x_o**2))*inch
         m = m*inch
-        S_x = Sx*inch**3
-        S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
-        r = R + t/2
     
     # SHEAR STRENGTH CALCULATIONS:
     
@@ -1350,10 +1320,29 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
     return FinalShearStrength
 
 # AXIAL STRENGTH FUNCTIONS:------------------------------------------------------------------------------------
-def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G, P_width, P_cond, K_x, K_y, K_t, L_x, L_t, L_y):
-    '''Calculation of CFS single stud capacity
+def getAxialStrength_Single(target_id:str, section_type:str, L_stud:float, Fy:float, S_bracing:float, E:float, G:float, P_width:float, P_cond:bool, K_x:float, K_y:float, K_t:float, L_x:float, L_t:float, L_y:float):
+    '''Calculation of CFS single stud axial capacity.
     Calculations apply ONLY to stud sections. Tracks are not available for the moment. 
-    :param str target_id: Section name or designation according to AISI manual
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        S_bracing (float): Weak axis bracing.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_x (float): Effective length factor x-axis.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        Lx (float): Strong axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        L_y (float): Weak axis unbraced length.
+
+    Returns:
+        forallpeople.Physical: Allowable axial strength.
     '''
     # Get Section properties from CSV file:
     target_id = str(target_id)
@@ -1368,14 +1357,11 @@ def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G
     L_t = L_t*ft
     poiss = 0.3
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
-    rawPath_track_section = r'' + track_section_path
     if section_type == 'stud':
         try:
             with open(rawPath_s_section, 'r', encoding="utf-8-sig") as csv_file:
-                # print('INSIDE CSV')
                 csv_reader = csv.DictReader(csv_file)
                 keys = csv_reader.fieldnames
                 
@@ -1396,55 +1382,17 @@ def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G
                             D = float(line[keys[4]])
                             R = float(line[keys[5]])
                             Area = float(line[keys[6]])
-                            weight = float(line[keys[7]])
                             Ix = float(line[keys[8]])
-                            Sx = float(line[keys[9]])
                             Iy = float(line[keys[11]])
-                            Sy = float(line[keys[12]])
                             x_m = float(line[keys[14]])
                             m = float(line[keys[15]])
                             J = float(line[keys[16]])
                             Cw = float(line[keys[17]])
-                            j = float(line[keys[18]])
                             xo = float(line[keys[20]])
         except FileNotFoundError as error:
             return 'FILE NOT FOUND ' + rawPath_s_section
     else:
-        try:
-            with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
-                csv_reader = csv.DictReader(csv_file)
-                keys = csv_reader.fieldnames
-                for line in csv_reader:
-                    list_sections.append(line['ID'])
-                if target_id not in list_sections:
-                    return "ERROR: INVALID SECTION"
-                else: 
-                    location = list_sections.index(target_id)
-                    csv_file.seek(0)
-                    next(csv_reader)
-                    for count,line in enumerate(csv_reader):
-                        if count == location:
-                            Depth = float(line[keys[1]])
-                            base = float(line[keys[2]])
-                            t = float(line[keys[3]])
-                            R = float(line[keys[4]])
-                            Area = float(line[keys[5]])
-                            weight = float(line[keys[6]])
-                            Ix = float(line[keys[7]])
-                            Sx = float(line[keys[8]])
-                            rx = float(line[keys[9]])
-                            Iy = float(line[keys[10]])
-                            Sy = float(line[keys[11]])
-                            ry = float(line[keys[12]])
-                            x_m = float(line[keys[13]])
-                            m = float(line[keys[14]])
-                            J = float(line[keys[15]])
-                            Cw = float(line[keys[16]])
-                            j = float(line[keys[17]])
-                            ro = float(line[keys[18]])
-                            xo = float(line[keys[19]])
-        except FileNotFoundError:
-            return 'FILE NOT FOUND ' + rawPath_track_section
+        return 'ERROR: Track sections not available'
 
     if target_id in list_sections:
         Depth = Depth*inch
@@ -1464,10 +1412,6 @@ def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G
         r_y = sqrt(Iyyg/Ag)*inch
         r_o = sqrt((r_x**2)+(r_y**2)+(x_o**2))*inch
         m = m*inch
-        S_x = Sx*inch**3
-        S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
-        r = R + t/2
     
     # CHECK FLEXURAL BUCKLING
     x_slender = (K_x*L_x)/(r_x)
@@ -1557,7 +1501,6 @@ def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G
         else: A_effective = Ag-A_dif_flange-A_w_lips_diff-A_web_ineff
         
         # DISTORTIONAL BUCKLING:
-        theta = 0.5*pi
         d_midline = D - (t/2)
         b_midline = base - t
         h_o = Depth
@@ -1634,7 +1577,31 @@ def getAxialStrength_Single(target_id, section_type, L_stud, Fy, S_bracing, E, G
         else: 
             return "FATAL ERROR -  CHECK SCRIPT"    
 
-def getAxialStrength_Boxed(target_id, section_type, L_stud, Fy, S_bracing, E, G, P_width, P_cond, K_x, K_y, K_t, L_x, L_t, L_y, a):
+def getAxialStrength_Boxed(target_id:str, section_type:str, L_stud:float, Fy:float, S_bracing:float, E:float, G:float, P_width:float, P_cond:bool, K_x:float, K_y:float, L_x:float, L_t:float, L_y:float, a:float):
+    '''Calculation of CFS built-up boxed member axial capacity.
+    Calculations apply ONLY to stud sections. Tracks are not available for the moment. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        S_bracing (float): Weak axis bracing.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_x (float): Effective length factor x-axis.
+        K_y (float): Effective length factor y-axis.
+        L_x (float): Strong axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        L_y (float): Weak axis unbraced length.
+        a (float): Interconnection spacing.
+
+    Returns:
+        forallpeople.Physical: Allowable axial strength.
+    '''
+    
     # Get Section properties from CSV file:
     target_id = str(target_id)
     L_stud = L_stud*ft
@@ -1649,10 +1616,8 @@ def getAxialStrength_Boxed(target_id, section_type, L_stud, Fy, S_bracing, E, G,
     poiss = 0.3
     a = a*inch
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
-    rawPath_track_section = r'' + track_section_path
     if section_type == 'stud':
         try:
             with open(rawPath_s_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -1677,62 +1642,22 @@ def getAxialStrength_Boxed(target_id, section_type, L_stud, Fy, S_bracing, E, G,
                             D = float(line[keys[4]])
                             R = float(line[keys[5]])
                             Area = float(line[keys[6]])
-                            weight = float(line[keys[7]])
                             Ix = float(line[keys[8]])
-                            Sx = float(line[keys[9]])
                             Iy = float(line[keys[11]])
-                            Sy = float(line[keys[12]])
                             x_m = float(line[keys[14]])
                             m = float(line[keys[15]])
                             J = float(line[keys[16]])
                             Cw = float(line[keys[17]])
-                            j = float(line[keys[18]])
-                            xo = float(line[keys[20]])
         except FileNotFoundError as error:
             return 'FILE NOT FOUND ' + rawPath_s_section
     else:
-        try:
-            with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
-                csv_reader = csv.DictReader(csv_file)
-                keys = csv_reader.fieldnames
-                for line in csv_reader:
-                    list_sections.append(line['ID'])
-                if target_id not in list_sections:
-                    return "ERROR: INVALID SECTION"
-                else: 
-                    location = list_sections.index(target_id)
-                    csv_file.seek(0)
-                    next(csv_reader)
-                    for count,line in enumerate(csv_reader):
-                        if count == location:
-                            Depth = float(line[keys[1]])
-                            base = float(line[keys[2]])
-                            t = float(line[keys[3]])
-                            R = float(line[keys[4]])
-                            Area = float(line[keys[5]])
-                            weight = float(line[keys[6]])
-                            Ix = float(line[keys[7]])
-                            Sx = float(line[keys[8]])
-                            rx = float(line[keys[9]])
-                            Iy = float(line[keys[10]])
-                            Sy = float(line[keys[11]])
-                            ry = float(line[keys[12]])
-                            x_m = float(line[keys[13]])
-                            m = float(line[keys[14]])
-                            J = float(line[keys[15]])
-                            Cw = float(line[keys[16]])
-                            j = float(line[keys[17]])
-                            ro = float(line[keys[18]])
-                            xo = float(line[keys[19]])
-        except FileNotFoundError:
-            return 'FILE NOT FOUND ' + rawPath_track_section
+        return 'ERROR: Track sections not available'
 
     if target_id in list_sections:
         Depth = Depth*inch
         Ag = Area*inch**2
         Ixxg = Ix*inch**4
         Iyyg = Iy*inch**4
-        x_o = xo*inch
         Cw = Cw*inch**6
         base = base*inch
         t = t*inch
@@ -1741,24 +1666,15 @@ def getAxialStrength_Boxed(target_id, section_type, L_stud, Fy, S_bracing, E, G,
             D = D*inch # this is the small d value - lip dimension
         x_m = x_m*inch
         J = J*inch**4
-        r_x = sqrt(Ixxg/Ag)*inch
         r_y = sqrt(Iyyg/Ag)*inch
-        r_o = sqrt((r_x**2)+(r_y**2)+(x_o**2))*inch
         m = m*inch
-        S_x = Sx*inch**3
-        S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
-        r = R + t/2
-
+        
     # BUILT UP SECTION PROPERTIES: 
     Atg = 2*Ag
     Ixxgt = 2*Ixxg
     Iyygt = 2*(Iyyg+Ag*((base-x_m)**2))
-    Cwt = 2*Cw
-    xot = 0*inch
     rxt = sqrt(Ixxgt/Atg)*inch
     ryt = sqrt(Iyygt/Atg)*inch
-    rot = sqrt(rxt**2 + ryt**2 + xot**2)*inch
     
     # FLEXURAL BUCKLING STRESS:
     x_slender = (K_x*L_x)/(rxt)
@@ -1857,7 +1773,31 @@ def getAxialStrength_Boxed(target_id, section_type, L_stud, Fy, S_bracing, E, G,
     P_a_final = P_a.to('kip')
     return P_a_final
 
-def getAxialStrength_B2B(target_id, section_type, L_stud, Fy, S_bracing, E, G, P_width, P_cond, K_x, K_y, K_t, L_x, L_t, L_y, a):
+def getAxialStrength_B2B(target_id:str, section_type:str, L_stud:float, Fy:float, S_bracing:float, E:float, G:float, P_width:float, P_cond:bool, K_x:float, K_y:float, K_t:float, L_x:float, L_t:float, L_y:float, a:float):
+    '''Calculation of CFS built-up back to back member axial capacity.
+    Calculations apply ONLY to stud sections. Tracks are not available for the moment. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        S_bracing (float): Weak axis bracing.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_x (float): Effective length factor x-axis.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        L_x (float): Strong axis unbraced length.
+        L_y (float): Weak axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        a (float): Interconnection spacing.
+
+    Returns:
+        forallpeople.Physical: Allowable axial strength.
+    '''
     # Get Section properties from CSV file:
     target_id = str(target_id)
     L_stud = L_stud*ft
@@ -1872,10 +1812,8 @@ def getAxialStrength_B2B(target_id, section_type, L_stud, Fy, S_bracing, E, G, P
     poiss = 0.3
     a = a*inch
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
-    rawPath_track_section = r'' + track_section_path
     if section_type == 'stud':
         try:
             with open(rawPath_s_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -1900,55 +1838,17 @@ def getAxialStrength_B2B(target_id, section_type, L_stud, Fy, S_bracing, E, G, P
                             D = float(line[keys[4]])
                             R = float(line[keys[5]])
                             Area = float(line[keys[6]])
-                            weight = float(line[keys[7]])
                             Ix = float(line[keys[8]])
-                            Sx = float(line[keys[9]])
                             Iy = float(line[keys[11]])
-                            Sy = float(line[keys[12]])
                             x_m = float(line[keys[14]])
                             m = float(line[keys[15]])
                             J = float(line[keys[16]])
                             Cw = float(line[keys[17]])
-                            j = float(line[keys[18]])
                             xo = float(line[keys[20]])
         except FileNotFoundError as error:
             return 'FILE NOT FOUND ' + rawPath_s_section
     else:
-        try:
-            with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
-                csv_reader = csv.DictReader(csv_file)
-                keys = csv_reader.fieldnames
-                for line in csv_reader:
-                    list_sections.append(line['ID'])
-                if target_id not in list_sections:
-                    return "ERROR: INVALID SECTION"
-                else: 
-                    location = list_sections.index(target_id)
-                    csv_file.seek(0)
-                    next(csv_reader)
-                    for count,line in enumerate(csv_reader):
-                        if count == location:
-                            Depth = float(line[keys[1]])
-                            base = float(line[keys[2]])
-                            t = float(line[keys[3]])
-                            R = float(line[keys[4]])
-                            Area = float(line[keys[5]])
-                            weight = float(line[keys[6]])
-                            Ix = float(line[keys[7]])
-                            Sx = float(line[keys[8]])
-                            rx = float(line[keys[9]])
-                            Iy = float(line[keys[10]])
-                            Sy = float(line[keys[11]])
-                            ry = float(line[keys[12]])
-                            x_m = float(line[keys[13]])
-                            m = float(line[keys[14]])
-                            J = float(line[keys[15]])
-                            Cw = float(line[keys[16]])
-                            j = float(line[keys[17]])
-                            ro = float(line[keys[18]])
-                            xo = float(line[keys[19]])
-        except FileNotFoundError:
-            return 'FILE NOT FOUND ' + rawPath_track_section
+        return 'ERROR: Track sections not available'
 
     if target_id in list_sections:
         Depth = Depth*inch
@@ -1966,12 +1866,7 @@ def getAxialStrength_B2B(target_id, section_type, L_stud, Fy, S_bracing, E, G, P
         J = J*inch**4
         r_x = sqrt(Ixxg/Ag)*inch
         r_y = sqrt(Iyyg/Ag)*inch
-        r_o = sqrt((r_x**2)+(r_y**2)+(x_o**2))*inch
         m = m*inch
-        S_x = Sx*inch**3
-        S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
-        r = R + t/2
     
     # Built Up Section Properties:
     Atg = 2*Ag
@@ -2151,8 +2046,33 @@ def getAxialStrength_B2B(target_id, section_type, L_stud, Fy, S_bracing, E, G, P
 
 # BENDING STRENGTH FUNCTIONS:------------------------------------------------------------------------------------
 
-def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E, G, P_length, P_width, P_cond, K_x, K_y, K_t, L_x, L_t, L_y, Cb, dist_bracing, L_dist_br):
-    poiss = 0.3     
+def getFlexuralStrength_Single(target_id:str, section_type:str, L_stud:float, Fy:float, F_bracing:float, E:float, G:float, P_length:float, P_width:float, P_cond:bool, K_y:float, K_t:float, L_x:float, L_t:float, L_y:float, Cb:float, dist_bracing:bool, L_dist_br:float):
+    '''Calculation of CFS single member bending capacity.
+    Calculations apply to stud and track sections. Calculations for punched tracks are not available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        F_bracing (float): Weak axis flexural bracing.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        L_x (float): Strong axis unbraced length.
+        L_y (float): Weak axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        Cb (float): Bending coefficient.
+        dist_bracing (bool): Distortional bracing status.
+        L_dist_br (float): Distortional bracing unbraced length.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
+    poiss = 0.3
     L_stud = L_stud*ft
     Fy = Fy*ksi
     F_bracing = F_bracing*ft
@@ -2168,8 +2088,8 @@ def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E
     P_corner_radi = 0.25*inch # Punchout corner radii FIXED VALUE
     k_phi = 0*kip # rotational stiffness (0 to assume no stiffness provided - typically considered this way) FIXED VALUE
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -2196,16 +2116,13 @@ def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
                         Ix = float(line[keys[8]])
                         Sx = float(line[keys[9]])
                         Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
                         xo = float(line[keys[20]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -2226,19 +2143,13 @@ def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
                         Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
                         Ix = float(line[keys[7]])
                         Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
                         Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
                         Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
                         xo = float(line[keys[19]])
 
     if target_id in list_sections:
@@ -2263,6 +2174,10 @@ def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E
         S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
         S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
+    
+    # check if section is unpunched - track section:
+    if section_type == 'track' and P_cond == True:
+        return 'Calculation for punched track not available'
 
     # revision of limits for shape with holes:
     procedure_alt = False
@@ -2477,7 +2392,28 @@ def getFlexuralStrength_Single(target_id, section_type, L_stud, Fy, F_bracing, E
     
     return Final_Moment_Capacity
 
-def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_length, P_width, P_cond, K_x, K_y, K_t, Cb, a):
+def getFlexuralStrength_Boxed(target_id:str, section_type:str, L_stud:float, Fy:float, E:float, G:float, P_length:float, P_width:float, P_cond:bool, K_y:float, K_t:float, Cb:float, a:float):
+    '''Calculation of CFS built-up member boxed bending capacity.
+    Calculations apply to stud sections. Track sections NOT available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_length (float): Punchout length.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        Cb (float): Bending coefficient.
+        a (float): Interconnection spacing.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     # Inputs: 
     target_id = target_id           
     section_type = section_type
@@ -2491,7 +2427,6 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
     E = E*ksi
     G = G*ksi
     poiss = 0.3
-    L_x = L_stud
     L_t = F_bracing
     L_y = F_bracing
     
@@ -2500,10 +2435,8 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
     if a > s_max:
         return 'ERROR: Interconnection spacing is inadequate'
 
-    k_phi = 0*kip # rotational stiffness (0 to assume no stiffness provided - typically considered this way)
-
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -2530,16 +2463,13 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
                         Ix = float(line[keys[8]])
                         Sx = float(line[keys[9]])
                         Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
                         xo = float(line[keys[20]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -2561,19 +2491,13 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
                         Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
                         Ix = float(line[keys[7]])
                         Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
                         Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
                         Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
                         xo = float(line[keys[19]])
 
     if target_id in list_sections:
@@ -2598,6 +2522,10 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
         S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
         S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
+        
+    # check if section is unpunched - track section:
+    if section_type == 'track' and P_cond == True:
+        return 'Calculation for punched track not available'
     
     # revision of limits for shape with holes:
     procedure_alt = False
@@ -2669,15 +2597,20 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
     else: M_ne = min(S_f*F_n, M_y)
     
     # LOCAL BUCKLING INTERACTING WITH YIELDING AND GLOBAL BUCKLING:
-    if procedure_alt == False:
-        S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType='boxed') # At max stress
-        S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType='boxed') # At yielding point
-    else: 
-        S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType='boxed') # At max stress
-        S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType='boxed') # At yielding point
-    
-    # S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt,section_type,base,R,t,poiss,E,r,D,d_h,P_width)
-    # S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt,section_type,base,R,t,poiss,E,r,D,d_h,P_width)
+    if section_type == 'track':
+        if procedure_alt == False:
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, sectionType='boxed') # At max stress
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, sectionType='boxed') # At yielding point
+        else: 
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=d_h, P_width=P_width, sectionType='boxed') # At max stress
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h = d_h, P_width=P_width, sectionType='boxed') # At yielding point
+    else:
+        if procedure_alt == False:
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType='boxed') # At max stress
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType='boxed') # At yielding point
+        else: 
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType='boxed') # At max stress
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType='boxed') # At yielding point
     
     Mn_L = S_e*F_n
     Mn_L_Limit = S_et*Fy
@@ -2692,7 +2625,34 @@ def getFlexuralStrength_Boxed(target_id, section_type, L_stud, Fy, E, G, P_lengt
     
     return M_allow_final
 
-def getFlexuralStrength_B2B(target_id, section_type, L_stud, Fy, F_bracing, E, G, P_length, P_width, P_cond, K_x, K_y, K_t, L_x, L_t, L_y, Cb, dist_bracing, L_dist_br, a):
+def getFlexuralStrength_B2B(target_id:str, section_type:str, L_stud:float, Fy:float, F_bracing:float, E:float, G:float, P_length:float, P_width:float, P_cond:bool, K_y:float, K_t:float, L_x:float, L_t:float, L_y:float, Cb:float, dist_bracing:bool, L_dist_br:float, a:float):
+    '''Calculation of CFS built-up member back to back bending capacity.
+    Calculations apply to stud sections. Track sections NOT available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Yield stress.
+        F_bracing (float): Weak axis flexural bracing.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_length (float): Punchout length.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        L_x (float): Strong axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        L_y (float): Weak axis unbraced length.
+        Cb (float): Bending coefficient.
+        dist_bracing (bool): Distortional bracing status.
+        L_dist_br (float): Distortional bracing unbraced length.
+        a (float): Interconnection spacing.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     # Inputs: 
     target_id = target_id
     section_type = section_type
@@ -2717,8 +2677,8 @@ def getFlexuralStrength_B2B(target_id, section_type, L_stud, Fy, F_bracing, E, G
 
     k_phi = 0*kip # rotational stiffness (0 to assume no stiffness provided - typically considered this way)
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -2813,6 +2773,10 @@ def getFlexuralStrength_B2B(target_id, section_type, L_stud, Fy, F_bracing, E, G
         S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
         S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
+    
+    # check if section is unpunched - track section:
+    if section_type == 'track' and P_cond == True:
+        return 'Calculation for punched track not available'
     
     # BUILT UP SECTION PROPERTIES:
     Atg = 2*Ag
@@ -2902,14 +2866,21 @@ def getFlexuralStrength_B2B(target_id, section_type, L_stud, Fy, F_bracing, E, G
     
     # LOCAL BUCKLING INTERACTING WITH YIELDING AND GLOBAL BUCKLING:
     # Effective Section Modulus Calculations:
-
-    if P_cond == False:    
-        S_e, ho, bo = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, AnalysisType='F_n')
-        S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, AnalysisType='Yielding')
-    else:
-        S_e, ho, bo  = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width,'F_n')
-        S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, 'Yielding')
-    
+    if section_type == 'track':
+        if procedure_alt == False:    
+            S_e, ho, bo = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, AnalysisType='F_n')
+            S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, AnalysisType='Yielding')
+        else:
+            S_e, ho, bo  = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=d_h, P_width=P_width,AnalysisType='F_n')
+            S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=d_h, P_width=P_width, AnalysisType='Yielding')
+    else: 
+        if procedure_alt == False:    
+            S_e, ho, bo = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, AnalysisType='F_n')
+            S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, AnalysisType='Yielding')
+        else:
+            S_e, ho, bo  = calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width,'F_n')
+            S_et = calculateEffectiveSectionModulus_B2B(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, 'Yielding')
+        
     # MOMENT CAPACITY CALCULATION: 
     Mn_L = S_e*F_n
     Mn_L_Limit = S_et*Fy
@@ -3045,7 +3016,31 @@ def getFlexuralStrength_B2B(target_id, section_type, L_stud, Fy, F_bracing, E, G
 
     return M_allow_final
 
-def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_x, L_y, L_t, Fy, E, G, P_cond, P_width, P_length, K_y, K_t, Cb):
+def getFlexuralStrength_Single_GB(target_id:str, section_type:str, L_stud:float, F_bracing:float, L_x:float, L_y:float, L_t:float, Fy:float, E:float, G:float, P_cond:bool, P_width:float, P_length:float, K_y:float, K_t:float, Cb:float):
+    '''Calculation of CFS **globally braced** single member bending capacity.
+    Calculations apply to stud and track sections. Calculations for punched tracks are not available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        F_bracing (float): Weak axis flexural bracing.
+        L_x (float): Strong axis unbraced length.
+        L_y (float): Weak axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        Fy (float): Material Yield Stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_cond (bool): Punchout condition.
+        P_width (float): Punchout width.
+        P_length (float): Punchout length.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        Cb (float): Bending coefficient.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     poiss = 0.3
     L_stud = L_stud*ft
     Fy = Fy*ksi
@@ -3060,8 +3055,8 @@ def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_
 
     P_corner_radi = 0.25*inch # Punchout corner radii FIXED VALUE
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -3088,16 +3083,13 @@ def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
                         Ix = float(line[keys[8]])
                         Sx = float(line[keys[9]])
                         Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
                         xo = float(line[keys[20]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -3119,19 +3111,13 @@ def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
                         Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
                         Ix = float(line[keys[7]])
                         Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
                         Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
                         Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
                         xo = float(line[keys[19]])
 
     if target_id in list_sections:
@@ -3154,9 +3140,12 @@ def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_
         m = m*inch
         S_x = Sx*inch**3
         S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
 
+    # check if section is unpunched - track section:
+    if section_type == 'track' and P_cond == True:
+        return 'Calculation for punched track not available'
+    
     # revision of limits for shape with holes:
     procedure_alt = False
     if P_cond == True:
@@ -3234,7 +3223,27 @@ def getFlexuralStrength_Single_GB(target_id, section_type, L_stud, F_bracing, L_
     M_alo_final = M_alo.to('kipft')
     return M_alo_final 
 
-def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_cond, P_width, P_length, K_y, K_t, Cb):
+def getFlexuralStrength_Boxed_GB(target_id:str, section_type:str, L_stud:float, Fy:float, E:float, G:float, P_cond:bool, P_width:float, P_length:float, K_y:float, K_t:float, Cb:float):
+    '''Calculation of CFS **globally braced** built-up boxed member bending capacity.
+    Calculations apply to stud and track sections. Calculations for punched tracks are not available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        Fy (float): Material Yield Stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_cond (bool): Punchout condition.
+        P_width (float): Punchout width.
+        P_length (float): Punchout length.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        Cb (float): Bending coefficient.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     target_id = target_id
     section_type = section_type
     L_stud = L_stud*ft
@@ -3246,17 +3255,11 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
     E = E*ksi
     G = G*ksi
     poiss = 0.3
-    L_x = L_stud
     L_t = F_bracing
     L_y = F_bracing
-    
-    # a = a*inch
-    # s_max = L_stud/6
-    # if a > s_max:
-    #     return 'ERROR: Interconnection spacing is inadequate'
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -3283,16 +3286,13 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
                         Ix = float(line[keys[8]])
                         Sx = float(line[keys[9]])
                         Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
                         xo = float(line[keys[20]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
@@ -3314,19 +3314,13 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
                         Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
                         Ix = float(line[keys[7]])
                         Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
                         Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
                         Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
                         xo = float(line[keys[19]])
 
     if target_id in list_sections:
@@ -3349,8 +3343,11 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
         m = m*inch
         S_x = Sx*inch**3
         S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
+    
+    # check if section is unpunched - track section:
+    if section_type == 'track' and P_cond == True:
+        return 'Calculation for punched track not available'
     
     # revision of limits for shape with holes:
     procedure_alt = False
@@ -3417,13 +3414,20 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
     elif F_cre <= (0.56*Fy): F_n = F_cre
     
     sectionType = 'boxed'
-    
-    if P_cond == False:
-        S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
-        S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
-    else: 
-        S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
-        S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
+    if section_type == 'track':
+        if procedure_alt == False:
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, sectionType=sectionType)
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, sectionType=sectionType)
+        else: 
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=d_h, P_width=P_width, sectionType=sectionType)
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=d_h, P_width=P_width, sectionType=sectionType)
+    else:
+        if procedure_alt == False:
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
+        else: 
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
     
     M_alo = min(S_e*Fy, S_et*Fy)
     M_alo = M_alo*2
@@ -3431,7 +3435,31 @@ def getFlexuralStrength_Boxed_GB(target_id, section_type, L_stud, Fy, E, G, P_co
     M_alo_final = M_alo.to('kipft')
     return M_alo_final
 
-def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, E, G, P_cond, P_width, P_length, L_x, L_t, L_y, K_y, K_t, Cb):
+def getFlexuralStrength_B2B_GB(target_id:str, section_type:str, L_stud:float, F_bracing:float,  Fy:float, E:float, G:float, P_cond:bool, P_width:float, P_length:float, L_x:float, L_t:float, L_y:float, K_y:float, K_t:float, Cb:float):
+    '''Calculation of CFS **globally braced** built-up back to back member bending capacity.
+    Calculations apply to stud and track sections. Calculations for punched tracks are not available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        L_stud (float): Length of member.
+        F_bracing (float): Weak axis flexural bracing.
+        Fy (float): Material Yield Stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_cond (bool): Punchout condition.
+        P_width (float): Punchout width.
+        P_length (float): Punchout length.
+        L_x (float): Strong axis unbraced length.
+        L_t (float): Twisting unbraced length.
+        L_y (float): Weak axis unbraced length.
+        K_y (float): Effective length factor y-axis.
+        K_t (float): Effective length factor for twisting.
+        Cb (float): Bending coefficient.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     # Inputs: 
     target_id = target_id
     section_type = section_type
@@ -3447,11 +3475,9 @@ def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, 
     L_x = L_x*ft
     L_t = L_t*ft
     L_y = L_y*ft
-
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
-    rawPath_track_section = r'' + track_section_path
     
     list_sections = []
     if section_type == 'stud':
@@ -3476,51 +3502,15 @@ def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, 
                         D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         Area = float(line[keys[6]])
-                        weight = float(line[keys[7]])
                         Ix = float(line[keys[8]])
-                        Sx = float(line[keys[9]])
                         Iy = float(line[keys[11]])
-                        Sy = float(line[keys[12]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
                         Cw = float(line[keys[17]])
-                        j = float(line[keys[18]])
                         xo = float(line[keys[20]])
     else:
-        with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            keys = csv_reader.fieldnames
-            
-            for line in csv_reader:
-                list_sections.append(line['ID'])
-            if target_id not in list_sections:
-                return 'ERROR: Section was not found in current reference file. Check your input or add the section manually.'
-            else: 
-                location = list_sections.index(target_id)
-                csv_file.seek(0)
-                next(csv_reader)
-                for count,line in enumerate(csv_reader):
-                    if count == location:
-                        Depth = float(line[keys[1]])
-                        base = float(line[keys[2]])
-                        t = float(line[keys[3]])
-                        R = float(line[keys[4]])
-                        Area = float(line[keys[5]])
-                        weight = float(line[keys[6]])
-                        Ix = float(line[keys[7]])
-                        Sx = float(line[keys[8]])
-                        rx = float(line[keys[9]])
-                        Iy = float(line[keys[10]])
-                        Sy = float(line[keys[11]])
-                        ry = float(line[keys[12]])
-                        x_m = float(line[keys[13]])
-                        m = float(line[keys[14]])
-                        J = float(line[keys[15]])
-                        Cw = float(line[keys[16]])
-                        j = float(line[keys[17]])
-                        ro = float(line[keys[18]])
-                        xo = float(line[keys[19]])
+        return 'ERROR: Track sections not available'
 
     if target_id in list_sections:
         Depth = Depth*inch
@@ -3536,13 +3526,7 @@ def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, 
             D = D*inch # this is the small d value - lip dimension
         x_m = x_m*inch
         J = J*inch**4
-        r_x = sqrt(Ixxg/Ag)*inch
-        r_y = sqrt(Iyyg/Ag)*inch
-        r_o = sqrt((r_x**2)+(r_y**2)+(x_o**2))*inch
         m = m*inch
-        S_x = Sx*inch**3
-        S_f = S_x # Elastic section modulus of full unreduced section relative to extreme compression fiber
-        S_fy = S_x # Elastic section modulus of full unreduced section relative to extreme fiber in first yielding
         r = R + t/2
     
     # BUILT UP SECTION PROPERTIES:
@@ -3556,7 +3540,6 @@ def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, 
     rot = sqrt(rxt**2 + ryt**2 + xot**2)*inch
     J_tot = J*2
     S_ftot = (Ixxgt/(Depth/2))
-    S_fy_tot = S_ftot
     
     # revision of limits for shape with holes -  single section only:
     procedure_alt = False
@@ -3635,18 +3618,59 @@ def getFlexuralStrength_B2B_GB(target_id, section_type, L_stud, F_bracing,  Fy, 
     return M_alo_final
 
 # SHEAR STRENGTH FUNCTIONS: ------------------------------------------------------------------------------------
-def getShearStrength_Single(target_id, section_type, Fy, E, G, P_width, P_cond):
+def getShearStrength_Single(target_id:str, section_type:str, Fy:float, E:float, G:float, P_width:float, P_cond:bool):
+    '''Calculation of CFS single member shear capacity.
+    Calculations apply to stud sections. Track sections NOT available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        Fy (float): Yield stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+
+    Returns:
+        forallpeople.Physical: Allowable shear strength.
+    '''
+    
     finalShearStrength = getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond)
     return finalShearStrength
 
-def getShearStrength_BuiltUp(target_id, section_type, Fy, E, G, P_width, P_cond):
+def getShearStrength_BuiltUp(target_id:str, section_type:str, Fy:float, E:float, G:float, P_width:float, P_cond:bool):
+    '''Calculation of CFS single member shear capacity.
+    Calculations apply to stud sections. Track sections NOT available. 
+    
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        Fy (float): Yield stress.
+        E (float): Elastic modulus.
+        G (float): Shear Modulus.
+        P_width (float): Punchout width.
+        P_cond (bool): Punchout condition.
+
+    Returns:
+        forallpeople.Physical: Allowable shear strength.
+    '''
     # Applicable for both boxed and back to back built up sections
     finalShearStrength = getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond)*2
     return finalShearStrength
 
 # HSS SECTION DESIGN LIMIT STATES: -----------------------------------------------------------------------------
 
-def getHSSAxialStrength(hss_section, Fy, L_x, L_y):
+def getHSSAxialStrength(hss_section:str, Fy:float, L_x:float, L_y:float):
+    '''Calculation of HSS axial strength capacity.    
+    Args:
+        hss_section (str): HSS section name. 
+        Fy (float): Yield stress.
+        L_x (float): Strong axis unbraced length.
+        L_y (float): Weak axis unbraced length.
+
+    Returns:
+        forallpeople.Physical: Allowable axial strength.
+    '''
     # Get relevant section data: 
     E = 29000*ksi
     K_x = 1
@@ -3654,7 +3678,7 @@ def getHSSAxialStrength(hss_section, Fy, L_x, L_y):
     L_x = L_x*ft
     L_y = L_y*ft
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
@@ -3744,17 +3768,16 @@ def getHSSAxialStrength(hss_section, Fy, L_x, L_y):
 
     return P_allow
 
-def getHSSFlexuralStrength(hss_section, Fy ,Length, orientation):
-    # DIFFERENT LIMIT STATES TO CHECK ACCORDING TO THE AISC 14TH EDITION MANUAL:
-    #       YIELDING
-    #       FLANGE LOCAL BUCKLING 
-    #       WEB LOCAL BUCKLING
-    # Get relevant section data:
-    '''HSS Flexural Strength
-    :param str hss_section: Section name or designation according to AISC
-    :param float Fy: Yield strength
-    :param float Length: Length of the beam
-    :param str orientation: "weak" or "strong"
+def getHSSFlexuralStrength(hss_section:str, Fy:float ,Length:float, orientation:str):
+    '''Calculation of HSS bending strength capacity.    
+    Args:
+        hss_section (str): HSS section name. 
+        Fy (float): Yield stress.
+        Length (float): Strong axis unbraced length.
+        orientation (str): Design orientation of the HSS member, 'strong' or 'weak'.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
     '''
     # Note on Lateral Torsional Buckling:
     # Very long rectangular HSS bent about the major axis are subject tolateral-torsional buckling; however, the Specification provides no strength equation for this limit state since beam deflection will control for all reasonable case
@@ -3766,7 +3789,7 @@ def getHSSFlexuralStrength(hss_section, Fy ,Length, orientation):
     E = 29000*ksi
     Length= Length*ft
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
@@ -3913,13 +3936,22 @@ def getHSSFlexuralStrength(hss_section, Fy ,Length, orientation):
         M_allow = M_allow.to('kipft')
         return M_allow
         
-def getHSSShearStrength(hss_section, Fy, orientation):
+def getHSSShearStrength(hss_section:str, Fy:float, orientation:str):
+    '''Calculation of HSS bending strength capacity.    
+    Args:
+        hss_section (str): HSS section name. 
+        Fy (float): Yield stress.
+        orientation (str): Design orientation of the HSS member, 'strong' or 'weak'.
+
+    Returns:
+        forallpeople.Physical: Allowable bending strength.
+    '''
     orientation = orientation.lower()
     if orientation != 'strong' and orientation != 'weak':
         return 'ERROR: Incorrect section orientation'
     E = 29000*ksi
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
@@ -3993,12 +4025,6 @@ def getHSSShearStrength(hss_section, Fy, orientation):
     V_allow = V_allow.to('kip')
     
     return V_allow
-
-# Debugging section:
-
-
-
-
 
 
 
