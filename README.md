@@ -15,13 +15,13 @@ Contents
 ### Objective:
 The objective of this repository is to provide design functions can be imported into any other python script or used directly in an excel file spreadsheet as User Defined Functions (UDF) with the help of modules such as [xlwings](https://github.com/xlwings/xlwings), allowing users to design more easily these type of members which can become complicated to design by hand. 
 
-Aside from the manual itself, resources and examples related to the design of cold formed steel members are quite limited and typically very brief, not fully covering all possible design cases that can be present on typical cold formed steel members. This particular repository aims in providing as well another resource for structural engineers or any other curious mind with a simple algorithm that can be easily replicated and applied. The whole process can be read directly in the script and compared with the manuals standards published by the American Institute of Steel and Iron. 
+Aside from the manual itself, resources and examples related to the design of cold formed steel members are quite limited and typically very brief, not fully covering all possible design cases that can be present on typical cold formed steel members. This particular repository aims in providing as well another resource for structural engineers or any other curious mind with a simple algorithm that can be easily replicated and applied. The whole process can be read directly in the script and compared with the manuals and standards published by the American Institute of Steel and Iron. 
 
 ### Modules and Technologies Employed:
 The following modules were used in the development of this respository:
 * <a href="https://github.com/connorferster/forallpeople" target="_blank">forallpeople</a>: Used for better unit management during the calculation process. 
 * <a href="https://pypi.org/project/numpy/" target="_blank">numpy</a>: Used for simplification of some basic procedures when dealing with arrays.
-* <a href="https://docs.python.org/3/library/csv.html" target="_blank">csv</a>: Used to manage csv files when reading the properties of codl formed steel structural sections
+* <a href="https://docs.python.org/3/library/csv.html" target="_blank">csv</a>: Used to manage csv files when reading the properties of cold formed steel structural sections
 * <a href="https://docs.python.org/3/library/os.html" target="_blank">os</a>: Module used to determine the location of any external files needed for the module functions to work properly. 
 
 ### Design Capabilities:
