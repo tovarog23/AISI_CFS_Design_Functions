@@ -33,7 +33,7 @@ The functions developed return different capacities under the typical limit stat
 
 These are the typical values that need to be obtained in order to design most structural elements, and should be sufficient to design typical members within a load bearing wall panel or as part of a floor system in a cold formed steel building/project.
 
-**The design process and returned values only comply with the Allowable Stress Design (ASD) methodology for now. LRFD is pending for now.**
+**The design process and returned values only comply with the Allowable Stress Design (ASD) methodology for now. LRFD is pending and will be available on future updates.**
 
 **Current calculations are done using the imperial system of units. The code can be easily adapted by any potential user for another unit system if required, since all calculations are done with the `forallpeople` module.**
 
