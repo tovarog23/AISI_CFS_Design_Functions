@@ -18,7 +18,7 @@ The objective of this repository is to provide design functions can be imported 
 Aside from the manual itself, resources and examples related to the design of cold formed steel members are quite limited and typically very brief, not fully covering all possible design cases that can be present on typical cold formed steel members. This particular repository aims in providing as well another resource for structural engineers or any other curious mind with a simple algorithm that can be easily replicated and applied. The whole process can be read directly in the script and compared with the manuals and standards published by the American Institute of Steel and Iron. 
 
 ### Modules and Technologies Employed:
-The following modules were used in the development of this respository:
+The following modules were used in the development of this repository:
 * <a href="https://github.com/connorferster/forallpeople" target="_blank">forallpeople</a>: Used for better unit management during the calculation process. 
 * <a href="https://pypi.org/project/numpy/" target="_blank">numpy</a>: Used for simplification of some basic procedures when dealing with arrays.
 * <a href="https://docs.python.org/3/library/csv.html" target="_blank">csv</a>: Used to manage csv files when reading the properties of cold formed steel structural sections
