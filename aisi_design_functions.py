@@ -28,13 +28,9 @@ forallpeople.environment('structural', top_level=True)
 
 def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType):
     centroid = Depth/2
-
     num_iterations = 10;
-
     Max_stress = F_n
-
     results_list_centroids = []
-
     if procedure_alt == False:
         if section_type == 'track':
             for i in range(num_iterations):
@@ -85,7 +81,6 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                     diff = 0*inch
 
                 # Recompute properties by parts:
-
                 b_neg = -1*(diff) # negative length of negative element, if it exists
                 y_b_neg = t/2 + r + b1 - (b_neg/2) # centroidal location of negative component from top fiber
 
@@ -152,8 +147,7 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                     centroid = y_c
                     ref_stress = (Max_stress*centroid)/(Depth -  centroid)
                     Max_stress = ref_stress
-
-            Se_converted = round((S_e)/(16387.1*mm**3),3)
+                    
         elif section_type == 'stud':
             for i in range(num_iterations):
                 # COMPRESSION FLANGE
@@ -165,12 +159,9 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                     d_small = (D - R - t)
                     R_I = 1
                     b = w
-                    
                 else: 
                     # calculate effective width of flange
                     I_a = min(399*(t**4)*(((w/t)/S)-0.328)**3,(t**4)*(115*((w/t)/S)+5))
-                    # print(I_a)
-
                     d_small = (D - R - t)
                     I_s = ((d_small**3)*t*(sin(0.5*pi))**2)/12
                     R_I = min(1, I_s/I_a)
@@ -195,7 +186,6 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                 psi_lip = abs(f2_lip/f1_lip)
                 k_lip = 0.578/(psi_lip+0.34)
                 F_crl_lip = k_lip*(((pi**2)*E)/(12*(1-poiss**2)))*((t/d_small)**2)
-                # print(F_crl_lip)
 
                 lamb_lip = sqrt(f_lip/F_crl_lip)
                 rho_lip = (1-(0.22/lamb_lip))/(lamb_lip) # Eq.1.1-2
@@ -203,11 +193,17 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                 if lamb_lip <= 0.673: 
                     # b_lip = w
                     d_p_s = 1*d_small
-                    d_s = d_p_s*R_I
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
                 else: 
                     # b = rho_lip*w 
                     d_p_s = rho_lip*d_small
-                    d_s = d_p_s*R_I
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
 
                 # WEB REVISION
                 w_web = Depth - 2*(t + R)
@@ -345,12 +341,11 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                 rho = (1-(0.22/lamb_1))/(lamb_1) # Eq.1.1-2
                 
                 if lamb_1 <= 0.673: b = w
-                else: b = rho*w 
+                else: b = rho*w
 
                 # WEB REVISION - CONSIDERED AS A UNIFORMLY COMPRESSED UNSTIFFENED ELEMENT - PROCESS ACCOUNTS TOP COMP WEB
                 ''' ALTERNATIVE PROCESS CONSIDERING HOLES'''
-                
-                w_web = (Depth - d_h)/2
+                w_web = (Depth/2) - (d_h/2) - (R + t) 
                 k_web = 0.43
                 f_web = Max_stress
                 f1_web = (f_web*((centroid)-(t+R)))/(centroid)
@@ -431,13 +426,14 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                     centroid = y_c
                     ref_stress = (Max_stress*centroid)/(Depth -  centroid)
                     Max_stress = ref_stress
-                
+ 
         elif section_type == 'stud':
             for i in range(num_iterations):
                 # COMPRESSION FLANGE
                 w = base - 2*(R + t)
                 f = Max_stress
                 S = 1.28*sqrt(E/f)
+                
                 if w/t <= 0.328*S:
                     d_small = (D - R - t)
                     R_I = 1
@@ -474,16 +470,27 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
                 rho_lip = (1-(0.22/lamb_lip))/(lamb_lip) # Eq.1.1-2
 
                 if lamb_lip <= 0.673: 
-                    d_p_s = 1*d_small
-                    d_s = d_p_s*R_I
+                    d_p_s = 1*d_small # Effective width of stiffener, unmodified
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s
+                    else:
+                        d_s = d_p_s*R_I
                 else: 
-                    d_p_s = rho_lip*d_small
-                    d_s = d_p_s*R_I
+                    d_p_s = rho_lip*d_small # Effective width of stiffener modified accordingly
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
 
                 # WEB REVISION - CONSIDERED AS A UNIFORMLY COMPRESSED UNSTIFFENED ELEMENT - PROCESS ACCOUNTS TOP COMP WEB
                 ''' ALTERNATIVE PROCESS CONSIDERING HOLES : STUDS'''
+                # if sectionType == 'boxed':
+                #     w_web = ((Depth/2) - (d_h/2) - (R + t))
+                # else: 
+                #     w_web = ((Depth/2) - (d_h/2) - (R + t))*2
                 
-                w_web = (Depth - d_h)/2
+                w_web = ((Depth/2) - (d_h/2) - (R + t))*2
+            
                 k_web = 0.43
                 f_web = Max_stress
                 f1_web = (f_web*((centroid)-(t+R)))/(centroid)
@@ -560,6 +567,9 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
 
                 top_lip_Ipx = (top_lip**3)/12
                 bottom_lip_Ipx = (bottom_lip**3)/12
+                
+                ho = Depth
+                bo = base
 
                 Ipx_vector = np.array([top_flange_Ipx, bottom_flange_Ipx, top_web_Ipx, bottom_web_Ipx, web_neg_Ipx, top_inside_corner_Ipx, bottom_inside_corner_Ipx, top_outside_corner_Ipx,
                             bottom_outside_corner_Ipx, top_lip_Ipx, bottom_lip_Ipx])
@@ -591,7 +601,7 @@ def calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R
     else:
         return S_e
 
-def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, AnalysisType):
+def calculateEffectiveSectionModulus_BuiltUp(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, AnalysisType, builtUpSectionType):
     # EFFECTIVE SECTION MODULUS FOR STUD SECTIONS ONLY, NO B2B TRACKS ALLOWED
     centroid = Depth/2
     num_iterations = 20;
@@ -599,140 +609,20 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
     results_list_centroids = []
     if procedure_alt == False: # no holes considered
         if section_type == 'track':
-            for i in range(num_iterations):
-                # COMPRESSION FLANGE
-                w = base - (R + t)
-                f = Max_stress
-                k_flange = 0.43
-                F_crl = k_flange*(((pi**2)*E)/(12*(1-poiss**2)))*((t/w)**2)
-                lamb_1 = sqrt(f/F_crl)
-                rho = (1-(0.22/lamb_1))/(lamb_1) # Eq.1.1-2
-                
-                if lamb_1 <= 0.673: b = w
-                else: b = rho*w 
-
-                # WEB REVISION
-                w_web = Depth - 2*(R+t/2)-t
-                f_web = Max_stress
-                f1_web = (f_web*((centroid)-(t+R)))/(centroid)
-                f2_web = -1*((f_web*(Depth - (t+R) - centroid))/centroid)
-                psi_web = abs(f2_web/f1_web)
-
-                k_web = 4+2*((1+psi_web)**3)+2*(1+psi_web)
-                F_crl_web = k_web*(((pi**2)*E)/(12*(1-poiss**2)))*((t/w_web)**2)
-                lamb_web = sqrt(f1_web/F_crl_web)
-                rho_web = (1-(0.22/lamb_web))/(lamb_web) # Eq.1.1-2
-
-                if lamb_web <= 0.673: 
-                    b_web = w_web
-                else: 
-                    b_web = rho_web*w_web 
-                ho = Depth
-                bo = base
-                if ho/bo <= 4:
-                    b1 = b_web/(3+psi_web)
-                    if psi_web > 0.236:
-                        b2 = b_web/2
-                    else: 
-                        b2 = b_web - b1
-                else:
-                    b1 = b_web/(3+psi_web)
-                    b2 = b_web/(1+psi_web)-b1
-                # verify if ineffective portion exists for property calculation process
-                sum = b1 + b2
-                limit = centroid - (t + R)
-                if sum <= limit:
-                    diff = limit - sum
-                else:
-                    diff = 0*inch
-                # Recompute properties by parts:
-                b_neg = -1*(diff) # negative length of negative element, if it exists
-                y_b_neg = t/2 + r + b1 - (b_neg/2)            # centroidal location of negative component from top fiber
-                # generation of table values according to reference example in AISI manual
-                '''LENGTHS'''
-                top_flange_length = b
-                bottom_flange_length = w
-                web_length = w_web
-                web_neg_length = b_neg
-
-                top_inside_corner = (2*pi*(R + t/2))/4
-                bottom_inside_corner = (2*pi*(R + t/2))/4
-
-                Length_vector = np.array([top_flange_length, bottom_flange_length, web_length, web_neg_length, top_inside_corner, bottom_inside_corner])
-                
-                Length_sum = Length_vector.sum()
-
-                '''Y DISTANCES'''
-                top_flange_ytf = t/2
-                bottom_flange_ytf = Depth - t/2
-                web_ytf = Depth/2
-                web_neg_ytf = y_b_neg
-
-                top_inside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                bottom_inside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
-
-                ytf_vector = np.array([top_flange_ytf, bottom_flange_ytf, web_ytf, web_neg_ytf, top_inside_corner_ytf, bottom_inside_corner_ytf])
-                
-                Ly_results = Length_vector*ytf_vector
-                
-                Ly_total = Ly_results.sum()
-
-                Ly_2_results = Length_vector*(ytf_vector**2)
-                Ly_2_total = Ly_2_results.sum()
-
-                '''I'x CALCULATION'''
-
-                top_flange_Ipx = (t**3)/12
-                bottom_flange_Ipx = (t**3)/12
-                web_Ipx = (web_length**3)/12
-                web_neg_Ipx = (web_neg_length**3)/12
-
-                top_inside_corner_Ipx = ((pi/16)*(R+t)**3)-((pi/16)*(R)**3)
-                bottom_inside_corner_Ipx = ((pi/16)*(R+t)**3)-((pi/16)*(R)**3)
-
-                Ipx_vector = np.array([top_flange_Ipx, bottom_flange_Ipx, web_Ipx, web_neg_Ipx, top_inside_corner_Ipx, bottom_inside_corner_Ipx])
-
-                Ipx_total = Ipx_vector.sum()
-                # print(Ipx_total)
-
-                y_c = Ly_total/Length_sum
-
-                I_xe = (Ipx_total+Ly_2_total-((y_c**2)*Length_sum))*t
-                
-                S_e = I_xe/y_c
-                
-                results_list_centroids.append(y_c)
-                
-                if y_c > centroid:
-                    # centroid is below centerline
-                    centroid = y_c
-                    
-                elif y_c < centroid:
-                    # centroid is above centerline (max stress at bottom flange)
-                    centroid = y_c
-                    ref_stress = (Max_stress*centroid)/(Depth -  centroid)
-                    Max_stress = ref_stress
-                
-            # print(f'FINAL CENTROID FROM TOP FIBER: {centroid}')
-            # print(f'Se: {S_e}')
-            Se_converted = round((S_e)/(16387.1*mm**3),3)
+            return 'ERROR: Track sections are not allowed when using boxed or back to back members'
         elif section_type == 'stud':
             for i in range(num_iterations):
                 # COMPRESSION FLANGE
                 w = base - 2*(R + t)
                 f = Max_stress
                 S = 1.28*sqrt(E/f)
-
                 if w/t <= 0.328*S:
                     d_small = (D - R - t)
                     R_I = 1
                     b = w
-                    
                 else: 
                     # calculate effective width of flange
                     I_a = min(399*(t**4)*(((w/t)/S)-0.328)**3,(t**4)*(115*((w/t)/S)+5))
-                    # print(I_a)
-
                     d_small = (D - R - t)
                     I_s = ((d_small**3)*t*(sin(0.5*pi))**2)/12
                     R_I = min(1, I_s/I_a)
@@ -766,13 +656,18 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 if lamb_lip <= 0.673: 
                     # b_lip = w
                     d_p_s = 1*d_small
-                    d_s = d_p_s*R_I
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
                 else: 
                     # b = rho_lip*w 
                     d_p_s = rho_lip*d_small
-                    d_s = d_p_s*R_I
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
                 # Both compression lips assumed to be the same
-
                 # WEB REVISION
                 w_web = Depth - 2*(t + R)
                 f_web = Max_stress
@@ -809,7 +704,6 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                     diff = 0*inch
 
                 # Recompute properties by parts:
-
                 b_neg = -1*(diff) # negative length of negative element, if it exists
                 y_b_neg = t/2 + r + b1 - (b_neg/2) # centroidal location of negative component from top fiber
 
@@ -840,6 +734,7 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 bottom_lip_2 = d_small
                 
                 Length_vector = np.array([top_flange_length, top_flange_length_2, bottom_flange_length, bottom_flange_length_2, web_length, web_length_2,web_neg_length, web_neg_length_2, top_inside_corner, top_inside_corner_2, bottom_inside_corner, bottom_inside_corner_2, top_outside_corner,top_outside_corner_2, bottom_outside_corner, bottom_outside_corner_2, top_lip, top_lip_2, bottom_lip, bottom_lip_2])
+                
                 Length_sum = Length_vector.sum()
 
                 '''Y DISTANCES'''
@@ -852,15 +747,15 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 web_neg_ytf = y_b_neg
                 web_neg_ytf_2 = y_b_neg
 
-                top_inside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                top_inside_corner_ytf_2 = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                bottom_inside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
-                bottom_inside_corner_ytf_2 = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
+                top_inside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); 
+                top_inside_corner_ytf_2 = (t + R) - ((2*(R + t/2))/pi); 
+                bottom_inside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); 
+                bottom_inside_corner_ytf_2 = Depth - ((R + t) - ((2*(R + t/2))/pi)); 
 
-                top_outside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                top_outside_corner_ytf_2 = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                bottom_outside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
-                bottom_outside_corner_ytf_2 = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
+                top_outside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); 
+                top_outside_corner_ytf_2 = (t + R) - ((2*(R + t/2))/pi); 
+                bottom_outside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); 
+                bottom_outside_corner_ytf_2 = Depth - ((R + t) - ((2*(R + t/2))/pi)); 
 
                 top_lip_ytf = (R+t)+0.5*(d_s)
                 top_lip_ytf_2 = (R+t)+0.5*(d_s)
@@ -926,104 +821,7 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
             return 'ERROR: Incorrect Section, check source code'
     elif procedure_alt == True:
         if section_type == 'track':
-            for i in range(num_iterations):
-                # COMPRESSION FLANGE 
-                w = base - (R + t)
-                f = Max_stress
-                k_flange = 0.43
-                F_crl = k_flange*(((pi**2)*E)/(12*(1-poiss**2)))*((t/w)**2)
-                lamb_1 = sqrt(f/F_crl)
-                rho = (1-(0.22/lamb_1))/(lamb_1) # Eq.1.1-2
-                
-                if lamb_1 <= 0.673: b = w
-                else: b = rho*w 
-
-                # WEB REVISION - CONSIDERED AS A UNIFORMLY COMPRESSED UNSTIFFENED ELEMENT - PROCESS ACCOUNTS TOP COMP WEB
-                ''' ALTERNATIVE PROCESS CONSIDERING HOLES'''
-                
-                w_web = (Depth - d_h)/2
-                k_web = 0.43
-                f_web = Max_stress
-                f1_web = (f_web*((centroid)-(t+R)))/(centroid)
-                F_crl_web = k_web*(((pi**2)*E)/(12*(1-poiss**2)))*((t/w_web)**2)
-                lamb_web = sqrt(f1_web/F_crl_web)
-                rho_web = (1-(0.22/lamb_web))/(lamb_web) # Eq.1.1-2
-                
-                if lamb_web <= 0.673: b_web = w_web
-                else: b_web = rho_web*w_web 
-                
-                # TRACK SECITON - LIPS ARE NOT CHECKED
-                #HOLE PROPERTIES
-                hole_neg = -1*P_width
-                y_hole_neg = (Depth/2)
-                
-                # generation of table values according to reference example in AISI manual
-                '''LENGTHS'''
-                top_flange_length = b
-                bottom_flange_length = w
-                top_web_length = b_web
-                bottom_web_length = w_web
-                web_hole_neg = hole_neg
-
-                top_inside_corner = (2*pi*(R + t/2))/4
-                bottom_inside_corner = (2*pi*(R + t/2))/4
-
-                Length_vector = np.array([top_flange_length, bottom_flange_length, top_web_length, bottom_web_length, web_hole_neg, top_inside_corner, bottom_inside_corner])
-                
-                Length_sum = Length_vector.sum()
-
-                '''Y DISTANCES'''
-                top_flange_ytf = t/2
-                bottom_flange_ytf = Depth - t/2
-                top_web_ytf = (R+t)+0.5*top_web_length
-                bottom_web_ytf = (Depth - (R+t)) - 0.5*(w_web)
-                web__hole_neg_ytf = y_hole_neg
-
-                top_inside_corner_ytf = (t + R) - ((2*(R + t/2))/pi); # print(top_inside_corner_ytf)
-                bottom_inside_corner_ytf = Depth - ((R + t) - ((2*(R + t/2))/pi)); # print(bottom_inside_corner_ytf)
-
-                ytf_vector = np.array([top_flange_ytf, bottom_flange_ytf, top_web_ytf, bottom_web_ytf, web__hole_neg_ytf, top_inside_corner_ytf, bottom_inside_corner_ytf])
-                
-                Ly_results = Length_vector*ytf_vector
-                
-                Ly_total = Ly_results.sum()
-
-                Ly_2_results = Length_vector*(ytf_vector**2)
-                Ly_2_total = Ly_2_results.sum()
-
-                '''I'x CALCULATION'''
-
-                top_flange_Ipx = (t**3)/12
-                bottom_flange_Ipx = (t**3)/12
-                top_web_Ipx = (top_web_length**3)/12
-                bottom_web_Ipx = (bottom_web_length**3)/12
-                web_hole_neg_Ipx = (web_hole_neg**3)/12
-
-                top_inside_corner_Ipx = ((pi/16)*(R+t)**3)-((pi/16)*(R)**3)
-                bottom_inside_corner_Ipx = ((pi/16)*(R+t)**3)-((pi/16)*(R)**3)
-
-                Ipx_vector = np.array([top_flange_Ipx, bottom_flange_Ipx, top_web_Ipx, bottom_web_Ipx, web_hole_neg_Ipx, top_inside_corner_Ipx, bottom_inside_corner_Ipx])
-
-                Ipx_total = Ipx_vector.sum()
-
-                y_c = Ly_total/Length_sum
-
-                I_xe = (Ipx_total+Ly_2_total-((y_c**2)*Length_sum))*t
-                
-                S_e = I_xe/y_c
-                
-                results_list_centroids.append(y_c)
-                
-                if y_c > centroid:
-                    # centroid is below centerline
-                    centroid = y_c
-                    
-                elif y_c < centroid:
-                    # centroid is above centerline (max stress at bottom flange)
-                    centroid = y_c
-                    ref_stress = (Max_stress*centroid)/(Depth -  centroid)
-                    Max_stress = ref_stress
-                    
+            return 'ERROR: Track sections are not allowed when using boxed or back to back members'             
         elif section_type == 'stud':
             for i in range(num_iterations):
                 # COMPRESSION FLANGE
@@ -1038,8 +836,6 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 else: 
                     # calculate effective width of flange
                     I_a = min(399*(t**4)*(((w/t)/S)-0.328)**3,(t**4)*(115*((w/t)/S)+5))
-                    # print(I_a)
-
                     d_small = (D - R - t)
                     I_s = ((d_small**3)*t*(sin(0.5*pi))**2)/12
                     R_I = min(1, I_s/I_a)
@@ -1069,17 +865,25 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 rho_lip = (1-(0.22/lamb_lip))/(lamb_lip) # Eq.1.1-2
 
                 if lamb_lip <= 0.673: 
-                    d_p_s = 1*d_small
-                    d_s = d_p_s*R_I
+                    # b_lip = w
+                    d_p_s = 1*d_small # Effective width of stiffener, unmodified
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s
+                    else:
+                        d_s = d_p_s*R_I
                 else: 
-                    d_p_s = rho_lip*d_small
-                    d_s = d_p_s*R_I
+                    # b = rho_lip*w 
+                    d_p_s = rho_lip*d_small # Effective width of stiffener modified accordingly
+                    if w/t <= 0.328*S:
+                        d_s = d_p_s 
+                    else:
+                        d_s = d_p_s*R_I
+                        
                 ho = Depth
                 bo = base
                 # WEB REVISION - CONSIDERED AS A UNIFORMLY COMPRESSED UNSTIFFENED ELEMENT - PROCESS ACCOUNTS TOP COMP WEB
                 ''' ALTERNATIVE PROCESS CONSIDERING HOLES : STUDS'''
-                
-                w_web = (Depth - d_h)/2
+                w_web = ((Depth/2) - (d_h/2) - (R + t))*2
                 k_web = 0.43
                 f_web = Max_stress
                 f1_web = (f_web*((centroid)-(t+R)))/(centroid)
@@ -1096,7 +900,6 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
                 
                 # generation of table values according to reference example in AISI manual
                 '''LENGTHS'''
-                
                 top_flange_length = b
                 top_flange_length_2 = b
                 bottom_flange_length = w
@@ -1213,19 +1016,33 @@ def calculateEffectiveSectionModulus_B2B(Depth, F_n, procedure_alt, section_type
         else: 
             return 'ERROR: Incorrect section type value' 
               
-    if AnalysisType == 'F_n':
+    if AnalysisType == 'F_n' and builtUpSectionType == 'b2b':
         return S_e, ho, bo
     else: 
         return S_e
 
 def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
+    '''Calculation of CFS single stud shear capacity
+    Calculations apply to both stud and track sections. 
+    Args:
+        target_id (str): Section shape name. 
+        section_type (str): 'stud' or 'track'.
+        Fy (float): Yield stress (ksi).
+        E (float): Elastic modulus (ksi).
+        G (float): Shear Modulus (ksi).
+        P_width (float): Punchout width, typically 1.5 inches (in).
+        P_cond (bool): Punchout condition.
+
+    Returns:
+        forallpeople.Physical: Allowable shear strength single stud/track.
+    '''
     poiss = 0.3
     Fy = Fy*ksi
     E = E*ksi
     G = G*ksi
     P_width = P_width*inch
-    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -1247,14 +1064,11 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
                 for count,line in enumerate(csv_reader):
                     if count == location:
                         Depth = float(line[keys[1]])
-                        base = float(line[keys[2]])
                         t = float(line[keys[3]])
-                        D = float(line[keys[4]])
                         R = float(line[keys[5]])
                         x_m = float(line[keys[14]])
                         m = float(line[keys[15]])
                         J = float(line[keys[16]])
-                        Cw = float(line[keys[17]])
     else:
         with open(rawPath_track_section, 'r', encoding="utf-8-sig") as csv_file:
             csv_reader = csv.DictReader(csv_file)
@@ -1271,22 +1085,16 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
                 for count,line in enumerate(csv_reader):
                     if count == location:
                         Depth = float(line[keys[1]])
-                        base = float(line[keys[2]])
                         t = float(line[keys[3]])
                         R = float(line[keys[4]])
                         x_m = float(line[keys[13]])
                         m = float(line[keys[14]])
                         J = float(line[keys[15]])
-                        Cw = float(line[keys[16]])
 
     if target_id in list_sections:
         Depth = Depth*inch
-        Cw = Cw*inch**6
-        base = base*inch
         t = t*inch
         R = R*inch
-        if section_type == 'stud':
-            D = D*inch # this is the small d value - lip dimension
         x_m = x_m*inch
         J = J*inch**4
         m = m*inch
