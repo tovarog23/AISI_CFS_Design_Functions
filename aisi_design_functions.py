@@ -1444,7 +1444,7 @@ def getAxialStrength_Single(target_id:str, section_type:str, Fy:float, S_bracing
 
 def getAxialStrength_Boxed(target_id:str, section_type:str, Fy:float, S_bracing:float, E:float, G:float, P_width:float, P_cond:bool, K_x:float, K_y:float, L_x:float, a:float):
     '''Calculation of CFS built-up boxed member axial capacity.
-    Calculations apply ONLY to stud sections. Tracks are not available for the moment. 
+    Calculations apply ONLY to stud sections. Tracks will be added in the future.
     
     Args:
         target_id (str): Section shape name. 
@@ -1478,7 +1478,6 @@ def getAxialStrength_Boxed(target_id:str, section_type:str, Fy:float, S_bracing:
     a = a*inch
     list_sections = []
     s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     if section_type == 'stud':
         try:
@@ -1592,12 +1591,6 @@ def getAxialStrength_Boxed(target_id:str, section_type:str, Fy:float, S_bracing:
     A_flanges = 2*(b*t)
     A_w_flange = 2*w*t
     A_dif_flange = A_w_flange - A_flanges
-    
-    # k_lip = 0.43
-    # w_t = (d1/t)
-    # F_cr_2 = k_lip*(((pi**2)*E)/(12*(1-(poiss**2))))*((1/w_t)**2)
-    # lamb_2 = sqrt(f/F_cr_2)
-    # p_lip = (1-(0.22/lamb_2))/lamb_2
     d_s = d1
     if rel <= (0.328*S): d_lip = d_s
     else: d_lip = d_s*R_I
@@ -1635,7 +1628,7 @@ def getAxialStrength_Boxed(target_id:str, section_type:str, Fy:float, S_bracing:
 
 def getAxialStrength_B2B(target_id:str, section_type:str, Fy:float, S_bracing:float, E:float, G:float, P_width:float, P_cond:bool, K_x:float, K_y:float, K_t:float, L_x:float, L_t:float, a:float):
     '''Calculation of CFS built-up back to back member axial capacity.
-    Calculations apply ONLY to stud sections. Tracks are not available for the moment. 
+    Calculations apply ONLY to stud sections. Tracks will be added in the future.  
     
     Args:
         target_id (str): Section shape name. 
@@ -1899,7 +1892,7 @@ def getAxialStrength_B2B(target_id:str, section_type:str, Fy:float, S_bracing:fl
 # BENDING STRENGTH FUNCTIONS:------------------------------------------------------------------------------------
 def getFlexuralStrength_Single(target_id:str, section_type:str, Fy:float, F_bracing:float, E:float, G:float, P_length:float, P_width:float, P_cond:bool, K_y:float, K_t:float, L_x:float, Cb:float, dist_bracing=False,db_bracing=0.01):
     '''Calculation of CFS single member bending capacity.
-    Calculations apply to stud and track sections. Calculations for punched tracks are not available. 
+    Calculations apply to stud and track sections. Calculations for punched tracks are not available, will be added in the future. 
     
     Args:
         target_id (str): Section shape name. 
@@ -2744,7 +2737,7 @@ def getFlexuralStrength_B2B(target_id:str, section_type:str, L_stud:float, Fy:fl
 
 def getFlexuralStrength_Single_GB(target_id:str, section_type:str, Fy:float, F_bracing:float, E:float, G:float, P_length:float, P_width:float, P_cond:bool, K_y:float, K_t:float, L_x:float, Cb:float):
     '''Calculation of globally braced CFS single member bending capacity.
-    Calculations apply to stud and track sections. Calculations for punched tracks are not available.
+    Calculations apply to stud and track sections. Calculations for punched tracks will be added in the future.
     
     Args:
         target_id (str): Section shape name. 
@@ -3286,7 +3279,7 @@ def getShearStrength_Single(target_id:str, section_type:str, Fy:float, E:float, 
 
 def getShearStrength_BuiltUp(target_id:str, section_type:str, Fy:float, E:float, G:float, P_width:float, P_cond:bool):
     '''Calculation of built up CFS member shear capacity (boxed or back to back)
-    Calculations apply to both stud and track sections, including punched and unpunched
+    Calculations apply to both stud and track sections, including punched and unpunched.
     
     Args:
         target_id (str): Section shape name.
