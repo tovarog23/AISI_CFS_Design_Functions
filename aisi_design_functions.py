@@ -1041,8 +1041,8 @@ def getSingleShear(target_id, section_type, Fy, E, G, P_width, P_cond):
     E = E*ksi
     G = G*ksi
     P_width = P_width*inch
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -1169,8 +1169,8 @@ def getAxialStrength_Single(target_id:str, section_type:str, Fy:float, S_bracing
     else:
         L_m = L_x
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     if section_type == 'stud':
@@ -1477,7 +1477,7 @@ def getAxialStrength_Boxed(target_id:str, section_type:str, Fy:float, S_bracing:
     poiss = 0.3
     a = a*inch
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     if section_type == 'stud':
         try:
@@ -1662,7 +1662,7 @@ def getAxialStrength_B2B(target_id:str, section_type:str, Fy:float, S_bracing:fl
     poiss = 0.3
     a = a*inch
     list_sections = []
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     if section_type == 'stud':
         try:
@@ -1941,8 +1941,8 @@ def getFlexuralStrength_Single(target_id:str, section_type:str, Fy:float, F_brac
     P_corner_radi = 0.25*inch # Punchout corner radii FIXED VALUE
     k_phi = 0*kip # rotational stiffness (0 to assume no stiffness provided - typically considered this way) FIXED VALUE
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -2285,7 +2285,7 @@ def getFlexuralStrength_Boxed(target_id:str, section_type:str, L_stud:float, Fy:
     if a > s_max:
         return 'ERROR: Interconnection spacing is inadequate'
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     
     list_sections = []
@@ -2453,7 +2453,7 @@ def getFlexuralStrength_B2B(target_id:str, section_type:str, L_stud:float, Fy:fl
 
     k_phi = 0*kip # rotational stiffness (0 to assume no stiffness provided - typically considered this way)
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     
     list_sections = []
@@ -2778,8 +2778,8 @@ def getFlexuralStrength_Single_GB(target_id:str, section_type:str, Fy:float, F_b
 
     P_corner_radi = 0.25*inch # Punchout corner radii FIXED VALUE
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
-    track_section_path = os.path.dirname(__file__) + '\CFS_TRACK_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
+    track_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_TRACK_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     rawPath_track_section = r'' + track_section_path
     
@@ -2928,8 +2928,12 @@ def getFlexuralStrength_Single_GB(target_id:str, section_type:str, Fy:float, F_b
 
     sectionType = 'other'
     if P_cond == False:    
-        S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
-        S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType)
+        if section_type == 'track':
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0,P_width=P_width, sectionType=sectionType)   
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D=0, d_h=0, P_width=P_width, sectionType=sectionType)
+        else:
+            S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0,P_width=P_width, sectionType=sectionType) # At max stress
+            S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h=0, P_width=P_width, sectionType=sectionType) # At yielding point
     else: 
         S_e = calcEffectiveSectionModulus(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
         S_et = calcEffectiveSectionModulus(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width, sectionType)
@@ -2978,7 +2982,7 @@ def getFlexuralStrength_Boxed_GB(target_id:str, section_type:str, L_stud:float, 
     if a > s_max:
         return 'ERROR: Interconnection spacing is inadequate'
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     
     list_sections = []
@@ -3115,7 +3119,7 @@ def getFlexuralStrength_B2B_GB(target_id:str, section_type:str, L_stud:float, F_
     L_t = F_bracing
     L_y = F_bracing
 
-    s_section_path = os.path.dirname(__file__) + '\CFS_S_SECTION_DATA.csv'
+    s_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\CFS_S_SECTION_DATA.csv'
     rawPath_s_section = r'' + s_section_path
     
     list_sections = []
@@ -3249,9 +3253,6 @@ def getFlexuralStrength_B2B_GB(target_id:str, section_type:str, L_stud:float, F_
         S_e = calculateEffectiveSectionModulus_BuiltUp(Depth, F_n, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width,'F_n', 'b2b2')
         S_et = calculateEffectiveSectionModulus_BuiltUp(Depth, Fy, procedure_alt, section_type, base, R, t, poiss, E, r, D, d_h, P_width,'Yielding', 'b2b2')
     
-    print('Se: ', S_e)
-    print('S_et: ', S_et)
-    
     M_alo = min(S_e*Fy, S_et*Fy)
     M_alo = M_alo/1.67
     M_alo_final = M_alo.to('kipft')
@@ -3319,7 +3320,7 @@ def getHSSAxialStrength(hss_section:str, Fy:float, L_x:float, L_y:float):
     L_x = L_x*ft
     L_y = L_y*ft
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
@@ -3437,7 +3438,7 @@ def getHSSFlexuralStrength(hss_section:str, Fy:float, Length:float, orientation:
     E = 29000*ksi
     Length= Length*ft
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
@@ -3600,7 +3601,7 @@ def getHSSShearStrength(hss_section:str, Fy:float, orientation:str):
         return 'ERROR: Incorrect section orientation'
     E = 29000*ksi
     Fy = Fy*ksi
-    hss_section_path = os.path.dirname(__file__) + '\HSS_SECTION_DATA_JAMBS.csv'
+    hss_section_path = os.path.dirname(__file__) + '\\resources\\files\csv_data\HSS_SECTION_DATA_JAMBS.csv'
     rawPath_hss_section = r'' + hss_section_path
     list_sections = []
     try:
