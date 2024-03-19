@@ -1,4 +1,4 @@
-from math import pi, sqrt, sin, cos
+from math import pi, sqrt, sin
 import forallpeople
 import numpy as np
 import csv
