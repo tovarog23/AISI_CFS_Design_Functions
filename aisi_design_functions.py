@@ -3,8 +3,6 @@ import forallpeople
 import numpy as np
 import csv
 import os
-from scipy import integrate
-import time
 
 ''' Python version used: 3.9.13
     
