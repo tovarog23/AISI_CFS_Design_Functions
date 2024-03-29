@@ -2,7 +2,7 @@
 
 <img src="./resources/images/readme/wallPanels.png" style="margin:auto;max-width:70%;height:auto;display:block">
 
-<b>CFS Design Functions</b> consists of a simple python script containing several functions that can facilitate the design of typical load bearing wall panel cold formed steel members. 
+<b>CFS Design Functions</b> consists of a simple python script containing several functions that can facilitate the design of typical load bearing wall panel cold formed steel members, such as studs, headers, jambs, sills and tracks.
 
 Contents
 ===========
@@ -13,9 +13,9 @@ Contents
  * [Installation and Use](#installation-and-use)
 
 ### Objective:
-The objective of this repository is to provide design functions can be imported into any other python script or used directly in an excel file spreadsheet as User Defined Functions (UDF) with the help of modules such as [xlwings](https://github.com/xlwings/xlwings), allowing users to design more easily these type of members which can become complicated to design by hand. 
+The objective of this repository is to provide design functions can be imported into any other python script or used directly in an excel file spreadsheet as User Defined Functions (UDF) with the help of modules such as [xlwings](https://github.com/xlwings/xlwings), allowing users to design more easily cold formed steel members which can become complicated to design manually. 
 
-Aside from the manual itself, resources and examples related to the design of cold formed steel members are quite limited and typically very brief, not fully covering all possible design cases that can be present on typical cold formed steel members. This particular repository aims in providing as well another resource for structural engineers or any other curious mind with a simple algorithm that can be easily replicated and applied. The whole process can be read directly in the script and compared with the manuals and standards published by the American Institute of Steel and Iron. 
+Aside from the manual itself, resources and examples related to the design of cold formed steel members are quite limited and typically very brief, not fully covering all possible design cases that can be present on typical cold formed steel members forming part of load bearing wall panels. This particular repository aims in providing as well another resource for structural engineers or any other curious mind with a simple algorithm that can be easily replicated and applied. The whole process can be read directly in the script and compared with the manuals and standards published by the American Institute of Steel and Iron. 
 
 ### Modules and Technologies Employed:
 The following modules were used in the development of this repository:
@@ -42,7 +42,7 @@ These are the typical values that need to be obtained in order to design most st
 
 At this point, the functions only work with specific shapes and sections. Currently only typical C-Sections with and without lips (stud and track sections) were considered in the calculation process in each function. These sections that can be used in the functions developed can be found in Table I-2 and Table I-3 in the AISI Cold Formed Steel Design Manual.
 
-Since built up sections are also quite common, functions that can calculate the different limit state capacities of this type of elements were also included. Only back to back and boxed section configurations have been included so far in the repository.
+Since built up sections are also quite common, functions that can calculate the different limit state capacities for this type of elements were also included. Only back to back and boxed section configurations have been included so far in the repository.
 
 Additionally, cold-work of forming is not included in any of the functions and calculations. This consideration will be implemented in future versions. As of now, results without considering cold-work as per AISI remain on the conservative side. 
 
@@ -52,7 +52,7 @@ Other configurations with three or more studs will be included in the future.
 
 * Axial Strength Capacity: 
     1. `getAxialStrength_Single()`:
-    Returns the allowable axial strength of a single c-section stud **with** lips. Track sections currently are not available.
+    Returns the allowable axial strength of a single c-section stud **with and without** lips. Holes can be considered for both stud and track sections.
     2. `getAxialStrength_Boxed()`:
     Returns the allowable axial strength of a built up boxed c-section member **with** lips. Track sections currently are not available.
     3. `getAxialStrength_B2B()`:
@@ -62,7 +62,7 @@ Other configurations with three or more studs will be included in the future.
     1. `getFlexuralStrength_Single()`:
     Return the strong axis allowable bending moment of a single c-section member **with or without** lips. Track sections can only be used if unpunched.
     2. `getFlexuralStrength_Boxed()`: 
-    Return the strong axis allowable bending moment of a built-up c-section boxed member **with or without** lips. Track sections can only be used if unpunched.
+    Return the strong axis allowable bending moment of a built-up c-section boxed member **with** lips. Track sections are not available.
     3. `getFlexuralStrength_B2B()`:
     Return the strong axis allowable bending moment of a built-up c-section back to back member **with** lips. Track sections are not available.
 
@@ -70,7 +70,7 @@ Other configurations with three or more studs will be included in the future.
     1. `getFlexuralStrength_Single_GB()`:
     Return the strong axis allowable bending moment of a globally braced single c-section member **with or without** lips. Track sections can only be used if unpunched.
     2. `getFlexuralStrength_Boxed_GB()`:
-    Return the strong axis allowable bending moment of a globally braced built-up c-section boxed member **with** lips. Track sections can only be used if unpunched.
+    Return the strong axis allowable bending moment of a globally braced built-up c-section boxed member **with** lips. Track sections are not available.
     3. `getFlexuralStrength_B2B_GB()`:
     Return the strong axis allowable bending moment of a globally braced built-up c-section back to back member **with** lips. Track sections are not available.
 * Shear Strength Capacity:
@@ -96,9 +96,9 @@ Additionally, functions to calculate the capacity of HSS members were added to t
 Some calculation procedures were isolated as auxiliary functions to optimize the code and readability. The following additional functions can be found in the module being called inside several design functions:
 
 * `calcEffectiveSectionModulus()`:
-Returns the effective section modulus of a cold formed steel single member section, track or stud section. The calculation process is iterative and the amount of iterations can be adjusted inside the function. 
+Returns the effective section modulus of a cold formed steel single member section, track or stud section. The calculation process is iterative and the amount of iterations can be adjusted inside the function.
 * `calulateEffectiveSectionModulus_B2B()`:
-Returns the effective section modulus of a cold formed steel back to back built up section. The calculation process is iterative and can be ajdusted within the function. 
+Returns the effective section modulus of a cold formed steel built up section (boxed and back to back). The calculation process is iterative and can be adjusted within the function. 
 
 ### Parameters and Variables Used:
 The design functions include several parameters that at first glance might not be obvious. The following list explains each of the parameters that can be found in several or just some of module design functions:
@@ -131,9 +131,12 @@ Interconnection spacing for built up sections (boxed and back to back), inches.
 23. `hss_section`: <font color="yellowgreen">(Type: string)</font> HSS section for design and revision. Ex: 'HSS6X6X5/8'.
 24. `orientation`: <font color="yellowgreen">(Type: string)</font> Orientation of structural member to be designed. Shall be 'strong' axis or 'weak' axis. Only applicable for HSS section design functions.
 
+### Default Database Provided:
+By default, the repository already includes several CSV database files that can be used with the provided python design functions. Such files contain section properties of typical cold formed steel members used on load bearing wall panels and floor systems. Stud and track sections are included as well as HSS sections. The user can add more sections into the CSV files if necessary, since the current amount provided is limited to typical ones which may not necessarily satisfy the user or designer needs.  
+
 ## Installation and Use:
 
-No actual installation process is needed in this case. The script itself can be cloned or downloaded straight from the online repository an can be imported as a module in other Python scripts as needed. 
+No actual installation process is needed in this case. The script itself can be cloned or downloaded straight from the online repository and can be imported as a module in other Python scripts as needed. 
 
 Since functions were originally developed to automate CFS design spreadsheets in Excel, they can also be used with [xlwings](https://github.com/xlwings/xlwings). These can be imported as UDF with the xlwings add-in directly in an excel file and can be run automatically like a native excel function within a spreadsheet. 
 
