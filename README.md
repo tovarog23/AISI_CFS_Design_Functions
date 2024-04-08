@@ -126,7 +126,7 @@ Unbraced length for twisting, feet
 19. `a`: <font color="yellowgreen">(Type: float)</font>
 Interconnection spacing for built up sections (boxed and back to back), inches.
 20. `dist_bracing`: <font color="yellowgreen">(Type: bool)</font> Distortional bracing status, `True` or `False`.
-21. `L_dist_bracing`: <font color="yellowgreen">(Type: float)</font> Distortional bracing unbraced length, if bracing for this limit state is considered, feet.
+21. `db_bracing`: <font color="yellowgreen">(Type: float)</font> Distortional bracing unbraced length, if bracing for this limit state is considered, feet.
 22. `poiss`: <font color="yellowgreen">(Type: float)</font> Material poisson ratio, unitless. 
 23. `hss_section`: <font color="yellowgreen">(Type: string)</font> HSS section for design and revision. Ex: 'HSS6X6X5/8'.
 24. `orientation`: <font color="yellowgreen">(Type: string)</font> Orientation of structural member to be designed. Shall be 'strong' axis or 'weak' axis. Only applicable for HSS section design functions.
